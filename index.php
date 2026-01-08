@@ -12,7 +12,8 @@
     <button type="submit">Login</button>
 </form>
 
-echo "DEPLOY SUCCESS 2026";
+<?php echo "DEPLOY SUCCESS FINAL"; ?>
+
 
 </body>
 </html>
