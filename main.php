@@ -1,6 +1,6 @@
 <?php
 include "db.php";
-if (!isset($_SESSION['user'])) header("Location: login.php");
+if (!isset($_SESSION['user'])) header("Location: index.php");
 
 $search = $_GET['search'] ?? '';
 $query = "SELECT * FROM extinguisher";
