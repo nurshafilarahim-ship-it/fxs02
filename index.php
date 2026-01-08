@@ -12,7 +12,8 @@
     <button type="submit">Login</button>
 </form>
 
-<?php echo "DEPLOY SUCCESS FINAL"; ?>
+<!-- Test auto deploy to Plesk -->
+
 
 
 </body>
