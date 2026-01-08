@@ -23,7 +23,7 @@ $result = $conn->query($query);
     <h3>Fire Extinguisher</h3>
     <div>
         Welcome, <?= $_SESSION['user'] ?>
-        <a href="logout.php" class="btn btn-danger btn-sm">Logout</a>
+        <a href="logout.php" class="btn btn-danger btn-sm">keluar</a>
     </div>
 </div>
 
