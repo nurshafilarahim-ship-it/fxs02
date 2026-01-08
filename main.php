@@ -34,7 +34,7 @@ $result = $conn->query($query);
 
     <form method="get">
         <input type="text" name="search" placeholder="Search by ID">
-        <button class="btn btn-secondary">Search</button>
+        <button class="btn btn-secondary">Cari</button>
     </form>
 </div>
 
