@@ -17,10 +17,9 @@ if (!isset($_SESSION['user'])) {
 
 $search = $_GET['search'] ?? '';
 
-
 $query = "SELECT * FROM extinguisher";
 if ($search != '') {
-    $query .= " WHERE id = '$search'";
+    $query .= " WHERE serial_no LIKE '%$search%'";
 }
 
 $result = $conn->query($query);
@@ -53,7 +52,7 @@ $result = $conn->query($query);
     </button>
 
     <form method="get" class="d-flex">
-        <input type="text" name="search" class="form-control me-2" placeholder="Search by ID" value="<?= htmlspecialchars($search) ?>">
+        <input type="text" name="search" class="form-control me-2" placeholder="Search by Serial No" value="<?= htmlspecialchars($search) ?>">
         <button class="btn btn-secondary">Cari</button>
     </form>
 </div>
@@ -66,36 +65,21 @@ $result = $conn->query($query);
 <th>Name</th>
 <th>Type</th>
 <th>Serial No</th>
+<th>Location</th>
 <th>Check-up</th>
 <th>Expiry</th>
 <th>Days</th>
 <th>Status</th>
 <th>QR</th>
 <th>Action</th>
-
 </tr>
 
 <?php while ($row = $result->fetch_assoc()): ?>
-
-<?php
-    // AUTO STATUS CALCULATION (SAFETY)
-    $checkup = new DateTime($row['date_checkup']);
-    $expiry  = clone $checkup;
-    $expiry->modify('+10 years');
-
-    $today = new DateTime();
-
-    if ($today >= $expiry) {
-        $status = "<span class='badge bg-danger'>Expired</span>";
-    } else {
-        $status = "<span class='badge bg-success'>Active</span>";
-    }
-?>
-
 <tr>
 <td><?= htmlspecialchars($row['name']) ?></td>
 <td><?= htmlspecialchars($row['type']) ?></td>
 <td><?= htmlspecialchars($row['serial_no']) ?></td>
+<td><?= htmlspecialchars($row['location']) ?></td>
 <td><?= $row['date_checkup'] ?></td>
 <td><?= $row['expired_date'] ?></td>
 
@@ -122,16 +106,22 @@ if ($row['status'] == "Expired") {
 </td>
 
 <td>
-<a href="edit_item.php?id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-<a href="delete_item.php?id=<?= $row['id'] ?>"
-   class="btn btn-danger btn-sm"
-   onclick="return confirm('Delete this item?')">Delete</a>
+<a href="view.php?id=<?= $row['id'] ?>" class="btn btn-success btn-sm mb-1">
+    View / Print
+</a>
+
+<?php if ($row['edited']): ?>
+    <span class="btn btn-info btn-sm mb-1">Edited</span>
+<?php else: ?>
+    <a href="edit_item.php?id=<?= $row['id'] ?>" class="btn btn-warning btn-sm mb-1">Edit</a>
+<?php endif; ?>
+
+<a href="delete_item.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm mb-1" onclick="return confirm('Delete this item?')">Delete</a>
 </td>
 
+
 </tr>
-
 <?php endwhile; ?>
-
 </table>
 
 <!-- ADD MODAL -->
