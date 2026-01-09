@@ -14,6 +14,11 @@
           <!-- NAME -->
           <label>Name:</label>
           <input type="text" class="form-control mb-2" name="name" required>
+          
+		  <!-- LOCATION -->
+          <label>Location:</label>
+          <input type="text" class="form-control mb-2" name="location" required>
+
 
           <!-- TYPE (CUSTOM DROPDOWN) -->
           <label>Type:</label>

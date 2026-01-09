@@ -1,6 +1,9 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 include "db.php";
-require "phpqrcode/qrlib.php";
+require __DIR__ . "/lib/phpqrcode/qrlib.php";
 
 date_default_timezone_set("Asia/Kuala_Lumpur");
 
@@ -9,6 +12,7 @@ $name        = $_POST['name'];
 $type        = $_POST['type'];
 $serial_no   = $_POST['serial_no'];
 $expiry_date = $_POST['expiry_date'];
+$location    = $_POST['location'];
 
 /* SERVER DATE */
 $date_checkup = date("Y-m-d");
@@ -32,10 +36,11 @@ if ($expiry < $today || $years_diff >= 10) {
 /* INSERT DATA */
 $conn->query("
 INSERT INTO extinguisher
-(name, type, serial_no, date_checkup, expired_date, days_left, status)
+(name, type, serial_no, location, date_checkup, expired_date, days_left, status)
 VALUES
-('$name', '$type', '$serial_no', '$date_checkup', '$expiry_date', '$days_left', '$status')
+('$name', '$type', '$serial_no', '$location', '$date_checkup', '$expiry_date', '$days_left', '$status')
 ");
+
 
 /* GET ID */
 $id = $conn->insert_id;

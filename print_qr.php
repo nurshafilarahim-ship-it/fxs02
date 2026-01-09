@@ -13,7 +13,17 @@ $data = $conn->query("SELECT * FROM extinguisher WHERE id=$id")->fetch_assoc();
 <b>Name:</b> <?= htmlspecialchars($data['name']) ?><br>
 <b>Type:</b> <?= htmlspecialchars($data['type']) ?><br>
 <b>Serial:</b> <?= htmlspecialchars($data['serial_no']) ?><br>
+<b>Location:</b> <?= htmlspecialchars($data['location']) ?><br>
 <b>Status:</b> <?= htmlspecialchars($data['status']) ?><br>
+<b>
+<?php
+if ($data['status'] == 'Expired') {
+    echo "Expired for " . abs($data['days_left']) . " days";
+} else {
+    echo "Days left: " . $data['days_left'];
+}
+?>
+</b><br>
 
 <button onclick="printQR()">Print QR</button>
 

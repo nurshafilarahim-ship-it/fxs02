@@ -8,29 +8,30 @@ $data = $conn->query("SELECT * FROM extinguisher WHERE id=$id")->fetch_assoc();
 <html>
 <head>
 <title>Fire Extinguisher Info</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-<h3>Fire Extinguisher Information</h3>
+<h2>Fire Extinguisher Information</h2>
 
-<img src="assets/qrcodes/<?= $data['qr_image'] ?>" width="180"><br><br>
+<img src="assets/qrcodes/<?= $data['qr_image'] ?>" width="200"><br><br>
 
-<b>Name:</b> <?= $data['name'] ?><br>
-<b>Type:</b> <?= $data['type'] ?><br>
-<b>Serial No:</b> <?= $data['serial_no'] ?><br>
-<b>Check-up Date:</b> <?= $data['date_checkup'] ?><br>
-<b>Expiry Date:</b> <?= $data['expired_date'] ?><br>
-
-<b>Status:</b>
-<?= $data['status'] ?><br>
-
+<b>Name:</b> <?= htmlspecialchars($data['name']) ?><br>
+<b>Type:</b> <?= htmlspecialchars($data['type']) ?><br>
+<b>Serial No:</b> <?= htmlspecialchars($data['serial_no']) ?><br>
+<b>Location:</b> <?= htmlspecialchars($data['location']) ?><br>
+<b>Check-up Date:</b> <?= htmlspecialchars($data['date_checkup']) ?><br>
+<b>Status:</b> <?= htmlspecialchars($data['status']) ?><br>
 <b>
-<?= ($data['status']=="Expired")
-    ? "Expired for ".abs($data['days_left'])." days"
-    : "Days left: ".$data['days_left']
+<?php
+if ($data['status'] == 'Expired') {
+    echo "Expired for " . abs($data['days_left']) . " days";
+} else {
+    echo "Days left before expiry: " . $data['days_left'];
+}
 ?>
-</b>
+</b><br><br>
+
+<a href="print_qr.php?id=<?= $data['id'] ?>" class="btn btn-primary">Print QR</a>
 
 </body>
 </html>
