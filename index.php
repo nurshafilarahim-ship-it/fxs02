@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($conn->query($sql)) {
             header("Location: login.php");
-            exit;
+            exit; // important
         } else {
             $msg = "Email already registered";
         }
@@ -31,28 +31,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Register</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <title>Register</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
 <body class="d-flex justify-content-center align-items-center vh-100 bg-light">
 
 <form method="post" class="p-4 bg-white shadow rounded" style="width:350px">
-<h4 class="text-center mb-3">SIGN UP</h4>
+    <h4 class="text-center mb-3">SIGN UP</h4>
 
-<input class="form-control mb-2" name="name" placeholder="Name" required>
-<input class="form-control mb-2" name="email" type="email" placeholder="Email" required>
-<input class="form-control mb-2" name="position" placeholder="Position" required>
-<input class="form-control mb-2" name="password" type="password" placeholder="Password" required>
-<input class="form-control mb-2" name="confirm_password" type="password" placeholder="Confirm Password" required>
+    <input class="form-control mb-2" name="name" placeholder="Name" required>
+    <input class="form-control mb-2" name="email" type="email" placeholder="Email" required>
+    <input class="form-control mb-2" name="position" placeholder="Position" required>
+    <input class="form-control mb-2" name="password" type="password" placeholder="Password" required>
+    <input class="form-control mb-2" name="confirm_password" type="password" placeholder="Confirm Password" required>
 
-<div class="text-danger mb-2"><?= $msg ?></div>
+    <div class="text-danger mb-2"><?= htmlspecialchars($msg) ?></div>
 
-<button class="btn btn-primary w-100">Create Account</button>
+    <button class="btn btn-primary w-100">Create Account</button>
 
-<p class="text-center mt-3">
-Already have an account?
-<a href="login.php">Login here</a>
-</p>
+    <p class="text-center mt-3">
+        Already have an account?
+        <a href="login.php">Login here</a>
+    </p>
 </form>
 
 </body>
