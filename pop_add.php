@@ -46,7 +46,7 @@
                 </a>
               </li>
               <li>
-                <a class="dropdown-item text-white" href="#"
+                <a class="dropdown-item text-black" href="#"
                    data-value="CO2"
                    style="--hover-color:#333333;">
                    CO₂ – Class B & C
