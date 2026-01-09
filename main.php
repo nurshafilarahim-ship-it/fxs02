@@ -2,12 +2,21 @@
 session_start();
 include "db.php";
 
+/* AUTO UPDATE STATUS & DAYS LEFT */
+$conn->query("
+UPDATE extinguisher
+SET
+status = IF(expired_date < CURDATE(), 'Expired', 'Active'),
+days_left = DATEDIFF(expired_date, CURDATE())
+");
+
 if (!isset($_SESSION['user'])) {
     header("Location: index.php");
     exit;
 }
 
 $search = $_GET['search'] ?? '';
+
 
 $query = "SELECT * FROM extinguisher";
 if ($search != '') {
@@ -54,14 +63,16 @@ $result = $conn->query($query);
 <!-- TABLE -->
 <table class="table table-bordered table-striped align-middle text-center">
 <tr>
-    <th>Name</th>
-    <th>Type</th>
-    <th>Serial No</th>
-    <th>Date Checkup</th>
-    <th>Expired Date</th>
-    <th>Status</th>
-    <th>QR</th>
-    <th>Action</th>
+<th>Name</th>
+<th>Type</th>
+<th>Serial No</th>
+<th>Check-up</th>
+<th>Expiry</th>
+<th>Days</th>
+<th>Status</th>
+<th>QR</th>
+<th>Action</th>
+
 </tr>
 
 <?php while ($row = $result->fetch_assoc()): ?>
@@ -82,27 +93,41 @@ $result = $conn->query($query);
 ?>
 
 <tr>
-    <td><?= htmlspecialchars($row['name']) ?></td>
-    <td><?= htmlspecialchars($row['type']) ?></td>
-    <td><?= htmlspecialchars($row['serial_no']) ?></td>
-    <td><?= $row['date_checkup'] ?></td>
-    <td><?= $expiry->format('Y-m-d') ?></td>
-    <td><?= $status ?></td>
-    <td>
-        <?php if (!empty($row['qr_image'])): ?>
-            <img src="assets/qrcodes/<?= $row['qr_image'] ?>" width="60">
-        <?php endif; ?>
-    </td>
-    <td>
-        <a href="print_qr.php?id=<?= $row['id'] ?>" class="btn btn-success btn-sm mb-1">
-            Print
-        </a>
-        <a href="delete_item.php?id=<?= $row['id'] ?>" 
-           class="btn btn-danger btn-sm mb-1"
-           onclick="return confirm('Delete this record?')">
-            Delete
-        </a>
-    </td>
+<td><?= htmlspecialchars($row['name']) ?></td>
+<td><?= htmlspecialchars($row['type']) ?></td>
+<td><?= htmlspecialchars($row['serial_no']) ?></td>
+<td><?= $row['date_checkup'] ?></td>
+<td><?= $row['expired_date'] ?></td>
+
+<td>
+<?php
+if ($row['status'] == "Expired") {
+    echo "<span class='text-danger'>Expired " . abs($row['days_left']) . " days</span>";
+} else {
+    echo $row['days_left'] . " days left";
+}
+?>
+</td>
+
+<td>
+<span class="badge <?= $row['status']=='Expired' ? 'bg-danger':'bg-success' ?>">
+    <?= $row['status'] ?>
+</span>
+</td>
+
+<td>
+<?php if ($row['qr_image']): ?>
+<img src="assets/qrcodes/<?= $row['qr_image'] ?>" width="60">
+<?php endif; ?>
+</td>
+
+<td>
+<a href="edit_item.php?id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
+<a href="delete_item.php?id=<?= $row['id'] ?>"
+   class="btn btn-danger btn-sm"
+   onclick="return confirm('Delete this item?')">Delete</a>
+</td>
+
 </tr>
 
 <?php endwhile; ?>
