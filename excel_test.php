@@ -1,4 +1,7 @@
 <?php
-header("Content-Type: application/vnd.ms-excel");
-header("Content-Disposition: attachment; filename=test.xls");
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+echo "PHP works so far";
+
 echo "Test Excel file";
