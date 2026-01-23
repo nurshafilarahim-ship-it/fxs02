@@ -1,53 +1,116 @@
 <?php
 include "db.php";
-$id = $_GET['id'];
+
+if (!isset($_GET['id'])) {
+    die("Invalid QR");
+}
+
+$id = intval($_GET['id']);
 $data = $conn->query("SELECT * FROM extinguisher WHERE id=$id")->fetch_assoc();
-?>
 
-<h2>Fire Extinguisher Info</h2>
-
-<div class="print-only-qr">
-    <img src="assets/qrcodes/<?= htmlspecialchars($data['qr_image']) ?>" width="200">
-</div>
-
-<b>Name:</b> <?= htmlspecialchars($data['name']) ?><br>
-<b>Type:</b> <?= htmlspecialchars($data['type']) ?><br>
-<b>Serial:</b> <?= htmlspecialchars($data['serial_no']) ?><br>
-<b>Location:</b> <?= htmlspecialchars($data['location']) ?><br>
-<b>Status:</b> <?= htmlspecialchars($data['status']) ?><br>
-<b>
-<?php
-if ($data['status'] == 'Expired') {
-    echo "Expired for " . abs($data['days_left']) . " days";
-} else {
-    echo "Days left: " . $data['days_left'];
+if (!$data) {
+    die("QR data not found");
 }
 ?>
-</b><br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Print QR</title>
 
-<button onclick="printQR()">Print QR</button>
-
-<script>
-function printQR() {
-    window.print(); // Opens the browser's print dialog
-}
-</script>
+<!-- REQUIRED FOR MOBILE PRINT -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* Hide everything except QR when printing */
+body {
+    margin: 0;
+    padding: 0;
+    background: #0f172a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+/* QR container */
+.qr-wrapper {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    text-align: center;
+}
+
+.qr-wrapper img {
+    width: 220px;
+}
+
+/* Print button */
+.print-btn {
+    margin-top: 20px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* PRINT SETTINGS */
 @media print {
+    body {
+        background: #ffffff;
+    }
+
     body * {
-        visibility: hidden; /* hide all elements */
+        visibility: hidden;
     }
 
-    .print-only-qr, .print-only-qr * {
-        visibility: visible; /* show only QR div */
+    .qr-wrapper,
+    .qr-wrapper * {
+        visibility: visible;
     }
 
-    .print-only-qr {
+    .qr-wrapper {
         position: absolute;
-        top: 50px;
-        left: 50px;
+        top: 0;
+        left: 0;
+        padding: 0;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .print-btn {
+        display: none;
     }
 }
 </style>
+</head>
+
+<body>
+
+<div class="qr-wrapper">
+    <img src="assets/qrcodes/<?= htmlspecialchars($data['qr_image']) ?>" alt="QR Code">
+    <button class="print-btn" onclick="printQR()">Print QR</button>
+</div>
+
+<script>
+function printQR() {
+    // Mobile-safe print trigger
+    setTimeout(() => {
+        window.print();
+    }, 300);
+}
+
+/* OPTIONAL: auto print when page opened from QR
+   Uncomment if you want auto print */
+
+ window.onload = () => {
+    setTimeout(() => window.print(), 600);
+};
+</script>
+
+</body>
+</html>
