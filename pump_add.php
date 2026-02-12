@@ -2,65 +2,80 @@
 session_start();
 include 'db.php';
 
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
-    die("Access denied.");
+// ----------------------------
+// Access control
+// ----------------------------
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
 }
 
+// Check if user is normal role or QR logged in
 $user_id = $_SESSION['user_id'];
-$role = $_SESSION['role'];
-
-// For users, we check if they come from QR
+$role = strtolower($_SESSION['role'] ?? '');
 $from_qr = $_GET['from_qr'] ?? 0;
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $item = trim($_POST['item_name']);
-    $check = $_POST['checklist'];
-
-    // Only allow adding:
-    // Admin can always add
-    // User can add only from QR
-    if ($role === 'admin' || ($role === 'user' && $from_qr == 1)) {
-        $stmt = $conn->prepare("
-            INSERT INTO pump_inspection (item_name, checklist, created_by)
-            VALUES (?, ?, ?)
-        ");
-        $stmt->bind_param("ssi", $item, $check, $user_id);
-        $stmt->execute();
-
-        echo "<script>alert('Inspection submitted successfully'); window.location.href='pump_inspection.php';</script>";
-        exit();
-    } else {
-        die("You are not allowed to add here.");
-    }
+$allow_add = false;
+if ($role === 'admin') {
+    $allow_add = true;
+} elseif ($role === 'user' && isset($_SESSION['qr_logged_in'])) {
+    // QR logged-in users are allowed
+    $allow_add = true;
 }
 
+// ----------------------------
+// Handle form submission
+// ----------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_item']) && $allow_add) {
+    $item_name = $_POST['item_name'] ?? '';
+    $checklist = $_POST['checklist'] ?? '';
+
+    // Insert into pump_inspection table
+    $stmt = $conn->prepare("INSERT INTO pump_inspection (item_name, checklist, created_by) VALUES (?, ?, ?)");
+    $stmt->bind_param("ssi", $item_name, $checklist, $user_id);
+    $stmt->execute();
+
+    // Optional: unset QR login flag after first add
+    if (isset($_SESSION['qr_logged_in'])) {
+        unset($_SESSION['qr_logged_in']);
+    }
+
+    header("Location: pump_inspection.php?success=1");
+    exit();
+}
+
+// ----------------------------
+// Deny access if not allowed
+// ----------------------------
+if (!$allow_add) {
+    die("Access denied.");
+}
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Pump House Inspection - Add</title>
+<meta charset="UTF-8">
+<title>Pump Add</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<div class="container mt-5">
+    <h3>Add Pump Inspection Item</h3>
 
-<h2>Pump House Inspection</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label>Item Name</label>
+            <input type="text" name="item_name" class="form-control" required>
+        </div>
 
-<?php
-// Only show form if admin OR user from QR
-if ($role === 'admin' || ($role === 'user' && $from_qr == 1)):
-?>
-<form method="post">
-    <input type="text" name="item_name" placeholder="Item Name" required>
-    <select name="checklist" required>
-        <option value="">-- Select Status --</option>
-        <option value="Done">Done</option>
-        <option value="Not Done">Not Done</option>
-    </select>
-    <button type="submit">Submit</button>
-</form>
-<?php else: ?>
-<p>You cannot add inspection here. Users must scan the QR at the pump house to add.</p>
-<?php endif; ?>
+        <div class="mb-3">
+            <label>Checklist</label>
+            <textarea name="checklist" class="form-control" required></textarea>
+        </div>
 
+        <button type="submit" name="add_item" class="btn btn-primary">Add Item</button>
+    </form>
+</div>
 </body>
 </html>
